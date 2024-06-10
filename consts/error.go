@@ -6,4 +6,6 @@ const (
 	ERR_DATABSE string = "err database operation: "
 
 	ERR_SET_REDIS string = "err writing redis data: "
+
+	ERR_GET_REDIS string = "err getting redis data: "
 )
