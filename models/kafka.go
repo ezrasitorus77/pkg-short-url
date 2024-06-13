@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/segmentio/kafka-go"
+)
 
 type (
 	Topic struct {
@@ -30,7 +34,10 @@ type (
 	}
 
 	ConsumedData struct {
-		Err  error
+		Err     error
+		Message kafka.Message
+
+		// represents marshaled Message into respective consumer data struct
 		Data interface{}
 	}
 )
