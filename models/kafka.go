@@ -28,6 +28,11 @@ type (
 		GroupID   int8       `gorm:"column:group_id"`
 		IsSuccess bool       `gorm:"column:is_success"`
 	}
+
+	ConsumedData struct {
+		Err  error
+		Data interface{}
+	}
 )
 
 func (tbl *LogDBKafka) TableName() string {
