@@ -4,12 +4,14 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	Q_WHERE_EXACT_ROUTE_GROUP QChain = func(db *gorm.DB) *gorm.DB {
-		return db.Where("group = ?", true)
+func Q_WHERE_EXACT_ROUTE_GROUP(group string) QChain {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("group = ?", group)
 	}
+}
 
-	Q_WHERE_EXACT_METHOD_NAME QChain = func(db *gorm.DB) *gorm.DB {
-		return db.Where("method = ?", true)
+func Q_WHERE_EXACT_METHOD_NAME(method string) QChain {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("method = ?", method)
 	}
-)
+}
