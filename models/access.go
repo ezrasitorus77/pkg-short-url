@@ -17,6 +17,11 @@ type (
 		Method    string     `gorm:"column:method"`
 		ID        int16      `gorm:"column:id;primary_key" json:"id"`
 	}
+
+	APIKeys struct {
+		RouteKey  []byte
+		MethodKey []byte
+	}
 )
 
 func (tbl *RouteAccess) TableName() string {
