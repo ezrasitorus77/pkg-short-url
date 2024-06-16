@@ -25,7 +25,8 @@ const (
 
 	Token string = "Token"
 
-	XAPIKey               string = "X-Api-Key"
+	XAPIKeyRoute          string = "X-Api-Key-Route"
+	XAPIKeyMethod         string = "X-Api-Key-Method"
 	XForwardedHost        string = "X-Forwarded-Host"
 	XForwardedFor         string = "X-Forwarded-For"
 	XOriginHost           string = "X-Origin-Host"
