@@ -1,13 +1,13 @@
 package consts
 
 const (
-	OK                  string = "000"
-	Created             string = "001"
-	DuplicateData       string = "002"
-	Deleted             string = "003"
-	DataNotFound        string = "099"
-	BadRequest          string = "400"
-	Unauthorized        string = "401"
-	InternalServerError string = "500"
-	Redirected          string = "303"
+	RC_OK             string = "000"
+	RC_CREATED        string = "001"
+	RC_DUPLICATE_DATA string = "002"
+	RC_DELETED        string = "003"
+	RC_DATA_NOT_FOUND string = "099"
+	RC_BAD_REQUEST    string = "400"
+	RC_UNAUTHORIZED   string = "401"
+	RC_ISE            string = "500"
+	RC_REDIRECTED     string = "303"
 )
