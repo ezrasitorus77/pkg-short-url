@@ -52,7 +52,7 @@ func (lr LogReqBuilder) record(c *fiber.Ctx, reqBodyString, respBodyString strin
 	})
 }
 
-func (lr LogReqBuilder) setResponse(c *fiber.Ctx) {
+func (lr LogReqBuilder) setResponse(c *fiber.Ctx) error {
 	var (
 		resp         models.Response = lr.Resp
 		responseBody []byte
@@ -65,40 +65,42 @@ func (lr LogReqBuilder) setResponse(c *fiber.Ctx) {
 	requestBody, _ = json.Marshal(lr.ReqBody)
 
 	go lr.record(c, string(requestBody), string(responseBody))
+
+	return nil
 }
 
-func (lr LogReqBuilder) OK(c *fiber.Ctx) {
+func (lr LogReqBuilder) OK(c *fiber.Ctx) error {
 	c.Status(http.StatusOK)
 
-	lr.setResponse(c)
+	return lr.setResponse(c)
 }
 
-func (lr LogReqBuilder) Created(c *fiber.Ctx) {
+func (lr LogReqBuilder) Created(c *fiber.Ctx) error {
 	c.Status(http.StatusCreated)
 
-	lr.setResponse(c)
+	return lr.setResponse(c)
 }
 
-func (lr LogReqBuilder) Unauthorized(c *fiber.Ctx) {
+func (lr LogReqBuilder) Unauthorized(c *fiber.Ctx) error {
 	c.Status(http.StatusUnauthorized)
 
-	lr.setResponse(c)
+	return lr.setResponse(c)
 }
 
-func (lr LogReqBuilder) ISE(c *fiber.Ctx) {
+func (lr LogReqBuilder) ISE(c *fiber.Ctx) error {
 	c.Status(http.StatusInternalServerError)
 
-	lr.setResponse(c)
+	return lr.setResponse(c)
 }
 
-func (lr LogReqBuilder) BadRequest(c *fiber.Ctx) {
+func (lr LogReqBuilder) BadRequest(c *fiber.Ctx) error {
 	c.Status(http.StatusBadRequest)
 
-	lr.setResponse(c)
+	return lr.setResponse(c)
 }
 
-func (lr LogReqBuilder) Write(c *fiber.Ctx, httpCode int) {
+func (lr LogReqBuilder) Write(c *fiber.Ctx, httpCode int) error {
 	c.Status(httpCode)
 
-	lr.setResponse(c)
+	return lr.setResponse(c)
 }
