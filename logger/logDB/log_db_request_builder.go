@@ -12,6 +12,7 @@ import (
 type (
 	LogReqBuilder struct {
 		LogRequestData
+		db *gorm.DB
 	}
 
 	LogRequestData struct {
@@ -21,7 +22,13 @@ type (
 	}
 )
 
-func (lr LogReqBuilder) record(db *gorm.DB, c *fiber.Ctx, reqBodyString, respBodyString string) {
+func NewLogRequest(db *gorm.DB) LogReqBuilder {
+	return LogReqBuilder{
+		db: db,
+	}
+}
+
+func (lr LogReqBuilder) record(c *fiber.Ctx, reqBodyString, respBodyString string) {
 	var (
 		headers string = c.Request().Header.String()
 		errStr  string
@@ -31,7 +38,7 @@ func (lr LogReqBuilder) record(db *gorm.DB, c *fiber.Ctx, reqBodyString, respBod
 		errStr = lr.Err.Error()
 	}
 
-	db.Create(&models.LogDBRequest{
+	lr.db.Create(&models.LogDBRequest{
 		UserID:     0,
 		URL:        string(c.Request().URI().Path()),
 		Query:      string(c.Request().URI().QueryString()),
@@ -45,7 +52,7 @@ func (lr LogReqBuilder) record(db *gorm.DB, c *fiber.Ctx, reqBodyString, respBod
 	})
 }
 
-func (lr LogReqBuilder) setResponse(db *gorm.DB, c *fiber.Ctx) {
+func (lr LogReqBuilder) setResponse(c *fiber.Ctx) {
 	var (
 		resp         models.Response = lr.Resp
 		responseBody []byte
@@ -57,41 +64,41 @@ func (lr LogReqBuilder) setResponse(db *gorm.DB, c *fiber.Ctx) {
 	responseBody, _ = json.Marshal(resp)
 	requestBody, _ = json.Marshal(lr.ReqBody)
 
-	go lr.record(db, c, string(requestBody), string(responseBody))
+	go lr.record(c, string(requestBody), string(responseBody))
 }
 
-func (lr LogReqBuilder) OK(db *gorm.DB, c *fiber.Ctx) {
+func (lr LogReqBuilder) OK(c *fiber.Ctx) {
 	c.Status(http.StatusOK)
 
-	lr.setResponse(db, c)
+	lr.setResponse(c)
 }
 
-func (lr LogReqBuilder) Created(db *gorm.DB, c *fiber.Ctx) {
+func (lr LogReqBuilder) Created(c *fiber.Ctx) {
 	c.Status(http.StatusCreated)
 
-	lr.setResponse(db, c)
+	lr.setResponse(c)
 }
 
-func (lr LogReqBuilder) Unauthorized(db *gorm.DB, c *fiber.Ctx) {
+func (lr LogReqBuilder) Unauthorized(c *fiber.Ctx) {
 	c.Status(http.StatusUnauthorized)
 
-	lr.setResponse(db, c)
+	lr.setResponse(c)
 }
 
-func (lr LogReqBuilder) ISE(db *gorm.DB, c *fiber.Ctx) {
+func (lr LogReqBuilder) ISE(c *fiber.Ctx) {
 	c.Status(http.StatusInternalServerError)
 
-	lr.setResponse(db, c)
+	lr.setResponse(c)
 }
 
-func (lr LogReqBuilder) BadRequest(db *gorm.DB, c *fiber.Ctx) {
+func (lr LogReqBuilder) BadRequest(c *fiber.Ctx) {
 	c.Status(http.StatusBadRequest)
 
-	lr.setResponse(db, c)
+	lr.setResponse(c)
 }
 
-func (lr LogReqBuilder) Write(db *gorm.DB, c *fiber.Ctx, httpCode int) {
+func (lr LogReqBuilder) Write(c *fiber.Ctx, httpCode int) {
 	c.Status(httpCode)
 
-	lr.setResponse(db, c)
+	lr.setResponse(c)
 }

@@ -8,21 +8,28 @@ import (
 type (
 	LogKafkaBuilder struct {
 		models.LogDBKafka
+		db *gorm.DB
 	}
 )
 
-func (lk LogKafkaBuilder) record(db *gorm.DB, log models.LogDBKafka) {
-	db.Create(&log)
+func NewLogKafka(db *gorm.DB) LogKafkaBuilder {
+	return LogKafkaBuilder{
+		db: db,
+	}
 }
 
-func (lk LogKafkaBuilder) Success(db *gorm.DB, log models.LogDBKafka) {
+func (lk LogKafkaBuilder) record(log models.LogDBKafka) {
+	lk.db.Create(&log)
+}
+
+func (lk LogKafkaBuilder) Success(log models.LogDBKafka) {
 	log.IsSuccess = true
 
-	go lk.record(db, log)
+	go lk.record(log)
 }
 
-func (lk LogKafkaBuilder) Error(db *gorm.DB, log models.LogDBKafka) {
+func (lk LogKafkaBuilder) Error(log models.LogDBKafka) {
 	log.IsSuccess = false
 
-	go lk.record(db, log)
+	go lk.record(log)
 }
