@@ -6,6 +6,7 @@ import (
 
 	"github.com/ezrasitorus77/pkg-short-url/models"
 	"github.com/gofiber/fiber/v2"
+	"github.com/valyala/fasthttp"
 	"gorm.io/gorm"
 )
 
@@ -28,11 +29,10 @@ func NewLogRequest(db *gorm.DB) LogReqBuilder {
 	}
 }
 
-func (lr LogReqBuilder) record(c *fiber.Ctx, reqBodyString, respBodyString string) {
-	var (
-		headers string = c.Request().Header.String()
-		errStr  string
-	)
+func (lr LogReqBuilder) record(r *fasthttp.Request, httpCode int, reqBodyString, respBodyString string) {
+	var errStr string
+
+	defer fasthttp.ReleaseRequest(r)
 
 	if lr.Err != nil {
 		errStr = lr.Err.Error()
@@ -40,12 +40,12 @@ func (lr LogReqBuilder) record(c *fiber.Ctx, reqBodyString, respBodyString strin
 
 	lr.db.Create(&models.LogDBRequest{
 		UserID:     0,
-		URL:        string(c.Request().URI().Path()),
-		Query:      string(c.Request().URI().QueryString()),
-		Method:     string(c.Method()),
-		Headers:    headers,
+		URL:        string(r.URI().Path()),
+		Query:      string(r.URI().QueryString()),
+		Method:     string(r.Header.Method()),
+		Headers:    r.Header.String(),
 		ReqBody:    reqBodyString,
-		HTTPStatus: int8(c.Context().Response.StatusCode()),
+		HTTPStatus: int8(httpCode),
 		RespCode:   lr.Resp.RC,
 		RespBody:   respBodyString,
 		Error:      errStr,
@@ -54,9 +54,11 @@ func (lr LogReqBuilder) record(c *fiber.Ctx, reqBodyString, respBodyString strin
 
 func (lr LogReqBuilder) setResponse(c *fiber.Ctx) error {
 	var (
-		resp         models.Response = lr.Resp
-		responseBody []byte
-		requestBody  []byte
+		resp            models.Response = lr.Resp
+		responseBody    []byte
+		requestBody     []byte
+		newRequest      *fasthttp.Request = fasthttp.AcquireRequest()
+		originalRequest *fasthttp.Request = c.Request()
 	)
 
 	c.JSON(resp)
@@ -64,7 +66,10 @@ func (lr LogReqBuilder) setResponse(c *fiber.Ctx) error {
 	responseBody, _ = json.Marshal(resp)
 	requestBody, _ = json.Marshal(lr.ReqBody)
 
-	go lr.record(c, string(requestBody), string(responseBody))
+	originalRequest.Header.CopyTo(&newRequest.Header)
+	originalRequest.URI().CopyTo(newRequest.URI())
+
+	go lr.record(newRequest, c.Context().Response.StatusCode(), string(requestBody), string(responseBody))
 
 	return nil
 }
