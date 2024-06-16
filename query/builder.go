@@ -1,8 +1,6 @@
 package query
 
 import (
-	"fmt"
-
 	"gorm.io/gorm"
 )
 
@@ -23,8 +21,6 @@ type Query interface {
 }
 
 func (qv QValidator) validate(db *gorm.DB, chain ...QChain) *gorm.DB {
-	fmt.Println("validate")
-
 	if len(chain) > 0 {
 		for i := range chain {
 			db = chain[i](db)
