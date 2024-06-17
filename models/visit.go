@@ -17,10 +17,26 @@ type (
 		ID         int16     `gorm:"column:id;primary_key" json:"id"`
 		IsValid    bool      `gorm:"column:is_valid" json:"is_valid"`
 	}
+
+	Location struct {
+		CreatedAt   time.Time `gorm:"column:created_at" json:"created_at"`
+		TimeZone    string    `gorm:"column:time_zone" json:"time_zone"`
+		OrgName     string    `gorm:"column:org" json:"org"`
+		LongLat     string    `gorm:"column:longlat" json:"longlat"`
+		CountryCode string    `gorm:"column:country_code" json:"country_code"`
+		Region      string    `gorm:"column:region" json:"region"`
+		City        string    `gorm:"column:city" json:"city"`
+		VisitID     int16     `gorm:"column:visit_id" json:"visit_id"`
+		ID          int16     `gorm:"column:id;primary_key" json:"id"`
+	}
 )
 
 func (tbl *Visit) TableName() string {
 	return "visits"
+}
+
+func (tbl *Location) TableName() string {
+	return "visits_location"
 }
 
 func (tbl *Visit) Record(r *fasthttp.Request, ip string) {
