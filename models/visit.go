@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/ipinfo/go/v2/ipinfo"
 	"github.com/valyala/fasthttp"
 )
 
@@ -44,5 +45,14 @@ func (tbl *Visit) Record(r *fasthttp.Request, ip string) {
 	tbl.Referer = string(r.Header.Referer())
 	tbl.IP = ip
 	tbl.VisitedURL = string(r.RequestURI())
-	tbl.CreatedAt = time.Now()
+}
+
+func (tbl *Location) Set(visitID int16, ipData *ipinfo.Core) {
+	tbl.VisitID = visitID
+	tbl.City = ipData.City
+	tbl.Region = ipData.Region
+	tbl.CountryCode = ipData.Country
+	tbl.LongLat = ipData.Location
+	tbl.OrgName = ipData.Org
+	tbl.TimeZone = ipData.Timezone
 }
